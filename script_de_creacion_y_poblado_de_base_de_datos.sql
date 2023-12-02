@@ -4,163 +4,179 @@
 
 CREATE DATABASE IF NOT EXISTS finanzas_personales_db;
 
-CREATE TABLE `divisa` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `nombre` VARCHAR(50) NOT NULL,
-  `fecha_registro` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+CREATE TABLE `divisa`
+(
+  `id`             INT         NOT NULL AUTO_INCREMENT,
+  `nombre`         VARCHAR(50) NOT NULL,
+  `fecha_registro` DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 );
 
-CREATE TABLE `categoria_meta` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `nombre` VARCHAR(50) NOT NULL,
-  `descripcion` VARCHAR(50) NULL,
-  `fecha_registro` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+CREATE TABLE `categoria_meta`
+(
+  `id`             INT          NOT NULL AUTO_INCREMENT,
+  `nombre`         VARCHAR(50)  NOT NULL,
+  `descripcion`    VARCHAR(100) NULL,
+  `fecha_registro` DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 );
 
-CREATE TABLE `entidad_bancaria` (
-  `id` INT NOT NULL AUTO_INCREMENT,
+CREATE TABLE `entidad_bancaria`
+(
+  `id`     INT          NOT NULL AUTO_INCREMENT,
   `nombre` VARCHAR(150) NOT NULL,
   PRIMARY KEY (`id`)
 );
 
-CREATE TABLE `franquicia` (
-  `id` INT NOT NULL AUTO_INCREMENT,
+CREATE TABLE `franquicia`
+(
+  `id`     INT         NOT NULL AUTO_INCREMENT,
   `nombre` VARCHAR(80) NOT NULL,
   PRIMARY KEY (`id`)
 );
 
-CREATE TABLE `tipo_cuenta` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `nombre` VARCHAR(50) NOT NULL,
-  `descripcion` VARCHAR(50) NULL,
-  `fecha_registro` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+CREATE TABLE `tipo_cuenta`
+(
+  `id`             INT          NOT NULL AUTO_INCREMENT,
+  `nombre`         VARCHAR(50)  NOT NULL,
+  `descripcion`    VARCHAR(100) NULL,
+  `fecha_registro` DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 );
 
-CREATE TABLE `categoria_transaccion` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `nombre` VARCHAR(50) NOT NULL,
-  `descripcion` VARCHAR(50) NULL,
+CREATE TABLE `categoria_transaccion`
+(
+  `id`          INT          NOT NULL AUTO_INCREMENT,
+  `nombre`      VARCHAR(50)  NOT NULL,
+  `descripcion` VARCHAR(100) NULL,
   PRIMARY KEY (`id`)
 );
 
-CREATE TABLE `usuario` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `nombre` VARCHAR(100) NOT NULL,
-  `correo_electronico` VARCHAR(50) NOT NULL,
-  `contrasena` VARCHAR(20) NOT NULL,
-  `estado` BOOLEAN NOT NULL DEFAULT 0,
-  `fecha_registro` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `id_divisa` INT NOT NULL,
+CREATE TABLE `usuario`
+(
+  `id`                 INT          NOT NULL AUTO_INCREMENT,
+  `nombre`             VARCHAR(100) NOT NULL,
+  `correo_electronico` VARCHAR(50)  NOT NULL,
+  `contrasena`         VARCHAR(255)  NOT NULL,
+  `estado`             BOOLEAN      NOT NULL DEFAULT 0,
+  `fecha_registro`     DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `id_divisa`          INT          NOT NULL,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`id_divisa`) REFERENCES `divisa` (`id`)
 );
 
-CREATE TABLE `meta` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `nombre` VARCHAR(50) NOT NULL,
-  `descripcion` VARCHAR(120) NULL,
-  `valor` INT NOT NULL,
-  `fecha_final` DATETIME NOT NULL,
-  `fecha_registro` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `id_usuario` INT NOT NULL,
-  `id_categoria_meta` INT NOT NULL,
+CREATE TABLE `meta`
+(
+  `id`                INT            NOT NULL AUTO_INCREMENT,
+  `nombre`            VARCHAR(50)    NOT NULL,
+  `descripcion`       VARCHAR(150)   NULL,
+  `valor`             DECIMAL(11, 2) NOT NULL,
+  `fecha_final`       DATETIME       NOT NULL,
+  `fecha_registro`    DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `id_usuario`        INT            NOT NULL,
+  `id_categoria_meta` INT            NOT NULL,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id`),
   FOREIGN KEY (`id_categoria_meta`) REFERENCES `categoria_meta` (`id`)
 );
 
-CREATE TABLE `abono_meta` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `valor` INT NOT NULL,
-  `fecha_registro` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `id_meta` INT NOT NULL,
+CREATE TABLE `abono_meta`
+(
+  `id`             INT            NOT NULL AUTO_INCREMENT,
+  `valor`          DECIMAL(11, 2) NOT NULL,
+  `fecha_registro` DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `id_meta`        INT            NOT NULL,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`id_meta`) REFERENCES `meta` (`id`)
 );
 
-CREATE TABLE `tipo_interes` (
-  `id` INT NOT NULL AUTO_INCREMENT,
+CREATE TABLE `tipo_interes`
+(
+  `id`     INT         NOT NULL AUTO_INCREMENT,
   `nombre` VARCHAR(50) NOT NULL,
   PRIMARY KEY (`id`)
 );
 
-CREATE TABLE `prestamo` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `monto` INT NOT NULL DEFAULT 0,
-  `plazo` INT NOT NULL DEFAULT 0,
-  `tasa_interes` FLOAT NOT NULL DEFAULT 0,
-  `fecha_pago` DATETIME NOT NULL,
-  `fecha_inicio` DATETIME NOT NULL,
-  `fecha_registro` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `id_usuario` INT NOT NULL,
-  `id_entidad_bancaria` INT NOT NULL,
-  `id_tipo_interes` INT NOT NULL,
+CREATE TABLE `prestamo`
+(
+  `id`                  INT            NOT NULL AUTO_INCREMENT,
+  `monto`               DECIMAL(11, 2) NOT NULL,
+  `plazo`               INT            NOT NULL CHECK (`plazo` >= 1 AND `plazo` <= 36),
+  `tasa_interes`        FLOAT          NOT NULL CHECK (`tasa_interes` >= 0 AND `tasa_interes` <= 40),
+  `fecha_pago`          DATETIME       NOT NULL,
+  `fecha_inicio`        DATETIME       NOT NULL,
+  `fecha_registro`      DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `id_usuario`          INT            NOT NULL,
+  `id_entidad_bancaria` INT            NOT NULL,
+  `id_tipo_interes`     INT            NOT NULL,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id`),
   FOREIGN KEY (`id_entidad_bancaria`) REFERENCES `entidad_bancaria` (`id`),
   FOREIGN KEY (`id_tipo_interes`) REFERENCES `tipo_interes` (`id`)
 );
 
-CREATE TABLE `abono_prestamo` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `valor` INT NOT NULL,
-  `fecha_registro` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `id_prestamo` INT NOT NULL,
+CREATE TABLE `abono_prestamo`
+(
+  `id`             INT            NOT NULL AUTO_INCREMENT,
+  `valor`          DECIMAL(11, 2) NOT NULL,
+  `fecha_registro` DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `id_prestamo`    INT            NOT NULL,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`id_prestamo`) REFERENCES `prestamo` (`id`)
 );
 
-CREATE TABLE `tarjeta_credito` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `nombre` VARCHAR(50) NOT NULL,
-  `descripcion` VARCHAR(50) NULL,
-  `fecha_corte` DATETIME NOT NULL,
-  `fecha_limite_pago` DATETIME NOT NULL,
-  `limite_maximo_credito` INT NOT NULL,
-  `fecha_registro` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `id_usuario` INT NOT NULL,
-  `id_franquicia` INT NOT NULL,
-  `id_entidad_bancaria` INT NOT NULL,
+CREATE TABLE `tarjeta_credito`
+(
+  `id`                    INT         NOT NULL AUTO_INCREMENT,
+  `nombre`                VARCHAR(50) NOT NULL,
+  `descripcion`           VARCHAR(50) NULL,
+  `fecha_corte`           INT         NOT NULL CHECK (`fecha_corte` >= 1 AND `fecha_corte` <= 31),
+  `fecha_limite_pago`     INT         NOT NULL CHECK (`fecha_limite_pago` >= 1 AND `fecha_limite_pago` <= 31),
+  `limite_maximo_credito` INT         NOT NULL,
+  `fecha_registro`        DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `id_usuario`            INT         NOT NULL,
+  `id_franquicia`         INT         NOT NULL,
+  `id_entidad_bancaria`   INT         NOT NULL,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id`),
   FOREIGN KEY (`id_franquicia`) REFERENCES `franquicia` (`id`),
   FOREIGN KEY (`id_entidad_bancaria`) REFERENCES `entidad_bancaria` (`id`)
 );
 
-CREATE TABLE `cuenta` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `descripcion` VARCHAR(50) NOT NULL,
-  `saldo_disponible` INT NOT NULL,
-  `fecha_registro` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `id_tipo_cuenta` INT NOT NULL,
-  `id_entidad_bancaria` INT NOT NULL,
-  `id_usuario` INT NOT NULL,
+CREATE TABLE `cuenta`
+(
+  `id`                  INT            NOT NULL AUTO_INCREMENT,
+  `descripcion`         VARCHAR(50)    NOT NULL,
+  `saldo_disponible`    DECIMAL(11, 2) NOT NULL,
+  `fecha_registro`      DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `id_tipo_cuenta`      INT            NOT NULL,
+  `id_entidad_bancaria` INT            NOT NULL,
+  `id_usuario`          INT            NOT NULL,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`id_tipo_cuenta`) REFERENCES `tipo_cuenta` (`id`),
   FOREIGN KEY (`id_entidad_bancaria`) REFERENCES `entidad_bancaria` (`id`),
   FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id`)
 );
 
-CREATE TABLE `tipo_transaccion` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `nombre` VARCHAR(50) NOT NULL,
-  `descripcion` VARCHAR(50) NULL,
-  `id_categoria_transaccion` INT NOT NULL,
+CREATE TABLE `tipo_transaccion`
+(
+  `id`                       INT         NOT NULL AUTO_INCREMENT,
+  `nombre`                   VARCHAR(50) NOT NULL,
+  `descripcion`              VARCHAR(50) NULL,
+  `id_categoria_transaccion` INT         NOT NULL,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`id_categoria_transaccion`) REFERENCES `categoria_transaccion` (`id`)
 );
 
-CREATE TABLE `transaccion` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `valor` INT NOT NULL,
-  `fecha_transaccion` DATETIME NOT NULL,
-  `id_usuario` INT NOT NULL,
-  `id_cuenta` INT NOT NULL,
-  `id_categoria_transaccion` INT NOT NULL,
-  `id_tipo_transaccion` INT NOT NULL,
+CREATE TABLE `transaccion`
+(
+  `id`                       INT            NOT NULL AUTO_INCREMENT,
+  `valor`                    DECIMAL(11, 2) NOT NULL,
+  `fecha_transaccion`        DATETIME       NOT NULL,
+  `id_usuario`               INT            NOT NULL,
+  `id_cuenta`                INT            NOT NULL,
+  `id_categoria_transaccion` INT            NOT NULL,
+  `id_tipo_transaccion`      INT            NOT NULL,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`id_cuenta`) REFERENCES `cuenta` (`id`),
   FOREIGN KEY (`id_categoria_transaccion`) REFERENCES `categoria_transaccion` (`id`),
@@ -178,16 +194,16 @@ VALUES (1, 'Dólar'),
        (3, 'Euro');
 
 INSERT INTO usuario (id, nombre, correo_electronico, contrasena, estado, fecha_registro, id_divisa)
-VALUES (1, 'Juan Pérez', 'juan@mail.com', '123456', 1, '2020-05-14', 1),
-       (2, 'María López', 'maria@mail.com', 'qwerty', 1, '2020-05-14', 2),
-       (3, 'Luis Torres', 'luis@mail.com', '987654', 1, '2020-05-14', 3),
-       (4, 'Lucía García', 'lucia@mail.com', 'lucia123', 1, '2020-05-14', 1),
-       (5, 'Pedro Ruiz', 'pedro@mail.com', 'tucutucu1', 1, '2020-05-14', 2),
-       (6, 'Mónica Zapata', 'monica@mail.com', 'b624ndsi7', 1, '2020-05-14', 3),
-       (7, 'Pablo Reyes', 'pablo@mail.com', 'cl4v3p4bl0', 1, '2020-05-14', 1),
-       (8, 'Ana Cortéz', 'ana@mail.com', 'anit4555', 1, '2020-05-14', 2),
-       (9, 'Carlos Pineda', 'carlos@mail.com', 'p1n3d4', 1, '2020-05-14', 3),
-       (10, 'Patricia Mora', 'patricia@mail.com', 'm0r4p4t1', 0, '2020-05-14', 1);
+VALUES (1, 'Juan Pérez', 'juan@mail.com', SHA2('123456', 256), 1, '2020-05-14', 1),
+       (2, 'María López', 'maria@mail.com', SHA2('qwerty', 256), 1, '2020-05-14', 2),
+       (3, 'Luis Torres', 'luis@mail.com', SHA2('987654', 256), 1, '2020-05-14', 3),
+       (4, 'Lucía García', 'lucia@mail.com', SHA2('lucia123', 256), 1, '2020-05-14', 1),
+       (5, 'Pedro Ruiz', 'pedro@mail.com', SHA2('tucutucu1', 256), 1, '2020-05-14', 2),
+       (6, 'Mónica Zapata', 'monica@mail.com', SHA2('b624ndsi7', 256), 1, '2020-05-14', 3),
+       (7, 'Pablo Reyes', 'pablo@mail.com', SHA2('cl4v3p4bl0', 256), 1, '2020-05-14', 1),
+       (8, 'Ana Cortéz', 'ana@mail.com', SHA2('anit4555', 256), 1, '2020-05-14', 2),
+       (9, 'Carlos Pineda', 'carlos@mail.com', SHA2('p1n3d4', 256), 1, '2020-05-14', 3),
+       (10, 'Patricia Mora', 'patricia@mail.com', SHA2('m0r4p4t1', 256), 0, '2020-05-14', 1);
 
 INSERT INTO categoria_meta(id, nombre, descripcion, fecha_registro)
 VALUES (1, 'Viajes y transporte', 'Categoria de metas relacionadas a viajes', '2020-01-01'),
@@ -235,19 +251,17 @@ VALUES (1, 'Visa'),
        (2, 'Mastercard'),
        (3, 'American Express');
 
--- Faltan campos fechaCorte y fechaLimitePago (estos campos son tipo Int y aceptan valores entre 1 a 31)------------------------------------------------------
-INSERT INTO tarjeta_credito (id, nombre, descripcion, fecha_corte, fecha_limite_pago, limite_maximo_credito, id_usuario,
-                             id_franquicia, id_entidad_bancaria)
-VALUES (1, 'Visa Platinum', 'Para compras importantes e internacionales', '2023-08-22', '2023-09-03', 30000, 1, 1, 1),
-       (2, 'MasterCard Gold', 'Para entretenimiento y estilo de vida', '2023-08-24', '2023-09-05', 45000, 2, 2, 2),
-       (3, 'Visa Signature', 'Para viajes y alojamiento', '2023-08-26', '2023-09-07', 80000, 3, 1, 1),
-       (4, 'MasterCard Black', 'Para compras de lujo', '2023-08-28', '2023-09-09', 100000, 4, 2, 2),
-       (5, 'Visa Classic', 'Para compras diarias y esenciales', '2023-08-30', '2023-09-11', 20000, 5, 1, 1),
-       (6, 'MasterCard Standard', 'Para gastos generales', '2023-09-02', '2023-09-13', 28000, 6, 2, 2),
-       (7, 'Visa Gold', 'Para compras en línea', '2023-09-04', '2023-09-15', 35000, 7, 1, 1),
-       (8, 'MasterCard Platinum', 'Para viajes aéreos y recompensas', '2023-09-06', '2023-09-17', 50000, 8, 2, 2),
-       (9, 'Visa Business', 'Para gastos de negocio', '2023-09-08', '2023-09-19', 60000, 9, 1, 1),
-       (10, 'MasterCard Business', 'Para cuentas de publicidad y gastos comerciales', '2023-09-10', '2023-09-21', 88000,
+INSERT INTO tarjeta_credito (id, nombre, descripcion, fecha_corte, fecha_limite_pago, limite_maximo_credito, id_usuario, id_franquicia, id_entidad_bancaria)
+VALUES (1, 'Visa Platinum', 'Para compras importantes e internacionales', 22, 3, 30000, 1, 1, 1),
+       (2, 'MasterCard Gold', 'Para entretenimiento y estilo de vida', 24, 5, 45000, 2, 2, 2),
+       (3, 'Visa Signature', 'Para viajes y alojamiento', 26, 7, 80000, 3, 1, 1),
+       (4, 'MasterCard Black', 'Para compras de lujo', 28, 9, 100000, 4, 2, 2),
+       (5, 'Visa Classic', 'Para compras diarias y esenciales', 30, 11, 20000, 5, 1, 1),
+       (6, 'MasterCard Standard', 'Para gastos generales', 2, 13, 28000, 6, 2, 2),
+       (7, 'Visa Gold', 'Para compras en línea', 4, 15, 35000, 7, 1, 1),
+       (8, 'MasterCard Platinum', 'Para viajes aéreos y recompensas', 6, 17, 50000, 8, 2, 2),
+       (9, 'Visa Business', 'Para gastos de negocio', 8, 19, 60000, 9, 1, 1),
+       (10, 'MasterCard Business', 'Para cuentas de publicidad y gastos comerciales', 10, 21, 88000,
         10, 2, 2);
 
 INSERT INTO tipo_interes(nombre)
@@ -255,19 +269,17 @@ VALUES ('Efectivo Anual'),
        ('Nominal Anual'),
        ('Nominal Mensual');
 
--- Falta campo 'tipoInteres' (coumpuesto, mensual, anual, etc) y 'fechaPago' (tipo Int y acepta valores entre 1 y 31)------------------------------------------------------
-INSERT INTO prestamo(monto, plazo, tasa_interes, fecha_pago, fecha_inicio, id_usuario, id_entidad_bancaria,
-                     id_tipo_interes)
-VALUES (50000, 36, 6.5, '2026-09-10', '2023-09-10', 1, 1, 1),
-       (20000, 12, 5.0, '2024-09-10', '2023-09-10', 2, 2, 1),
-       (30000, 24, 3.5, '2025-09-10', '2023-09-10', 3, 1, 2),
-       (60000, 60, 4.0, '2028-09-10', '2023-09-10', 4, 2, 1),
-       (70000, 48, 6.0, '2027-09-10', '2023-09-10', 5, 1, 1),
-       (40000, 30, 7.0, '2026-03-10', '2023-09-10', 6, 2, 2),
-       (90000, 72, 5.5, '2029-09-10', '2023-09-10', 7, 1, 1),
-       (100000, 84, 8.0, '2031-02-10', '2023-09-10', 8, 2, 3),
-       (25000, 18, 4.5, '2025-03-10', '2023-09-10', 9, 1, 3),
-       (35000, 24, 6.5, '2025-09-10', '2023-09-10', 10, 2, 1);
+INSERT INTO prestamo(monto, plazo, tasa_interes, fecha_pago, fecha_inicio, id_usuario, id_entidad_bancaria, id_tipo_interes)
+VALUES (50000, 36, 6.5, 10, '2023-09-10', 1, 1, 1),
+       (20000, 12, 5.0, 10, '2023-09-10', 2, 2, 1),
+       (30000, 24, 3.5, 10, '2023-09-10', 3, 1, 2),
+       (60000, 60, 4.0, 10, '2023-09-10', 4, 2, 1),
+       (70000, 48, 6.0, 10, '2023-09-10', 5, 1, 1),
+       (40000, 30, 7.0, 10, '2023-09-10', 6, 2, 2),
+       (90000, 72, 5.5, 10, '2023-09-10', 7, 1, 1),
+       (100000, 84, 8.0, 10, '2023-09-10', 8, 2, 3),
+       (25000, 18, 4.5, 10, '2023-09-10', 9, 1, 3),
+       (35000, 24, 6.5, 10, '2023-09-10', 10, 2, 1);
 
 INSERT INTO abono_prestamo(valor, id_prestamo, fecha_registro)
 VALUES (1389, 1, '2023-10-10'),
