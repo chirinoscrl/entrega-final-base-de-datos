@@ -1,0 +1,140 @@
+create database finanzaspersonales
+
+CREATE TABLE `Usuario` (
+  `idUsuario` INT NOT NULL AUTO_INCREMENT,
+  `nombre` VARCHAR(100) NOT NULL,
+  `correoElectronico` VARCHAR(50) NOT NULL,
+  `contrasena` VARCHAR(20) NOT NULL,
+  `estado` BOOLEAN  NOT NULL DEFAULT 0,
+  `id_Divisa` INT NOT NULL,
+  `fechaRegisro` DATETIME NOT NULL,
+   PRIMARY KEY (`idUsuario`)
+    )
+
+CREATE TABLE `DIvisa` (
+  `idDIvisa` INT NOT NULL AUTO_INCREMENT,
+  `divisa` VARCHAR(50) NOT NULL,
+  PRIMARY KEY (`idDIvisa`),
+  )
+ 
+
+CREATE TABLE `Meta` (
+  `idMeta` INT NOT NULL AUTO_INCREMENT,
+  `idUsuario` INT NOT NULL,
+  `idCategoriaMeta` INT NOT NULL,
+  `nombre` VARCHAR(50) NOT NULL,
+  `descripcion` VARCHAR(50) NULL,
+  `valor` INT NOT NULL,
+  `fechaFinal` DATETIME NOT NULL,
+  `fechaRegistro` DATETIME NOT NULL,
+  PRIMARY KEY (`idMeta`)
+)
+
+CREATE TABLE `CategoriaMeta` (
+  `idCategoriaMeta` INT NOT NULL AUTO_INCREMENT,
+  `nombre` VARCHAR(50) NOT NULL,
+  `descripcion` VARCHAR(50) NULL,
+  `fechaRegistro` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`idCategoriaMeta`)
+  )
+  
+CREATE TABLE `Prestamo` (
+  `idPrestamo` INT NOT NULL AUTO_INCREMENT,
+  `idUsuario` INT NOT NULL,
+  `idEntidadBancaria` INT NOT NULL,
+  `monto` INT NOT NULL DEFAULT 0,
+  `tasaInteres` FLOAT NOT NULL DEFAULT 0,
+  `tipoInteres` VARCHAR(45) NOT NULL,
+  `fechaPago` INT NOT NULL COMMENT 'Numeros entre 1 y 31',
+  `fechaInicio` DATETIME NOT NULL,
+  `fechaRegistro` DATETIME NOT NULL,
+  PRIMARY KEY (`idPrestamo`)
+  )
+  
+CREATE TABLE `AbonoPrestamo` (
+  `idAbonoPrestamo` INT NOT NULL AUTO_INCREMENT,
+  `idPrestamo` INT NOT NULL,
+  `valor` INT NOT NULL,
+  `fechaRegistro` DATETIME NOT NULL,
+  PRIMARY KEY (`idAbonoPrestamo`)
+  )
+
+CREATE TABLE `AbonoMeta` (
+  `idAbonoMeta` INT NOT NULL AUTO_INCREMENT,
+  `idMeta` INT NOT NULL,
+  `valor` INT NOT NULL,
+  `fechaRegistro` DATETIME NOT NULL,
+  PRIMARY KEY (`idAbonoMeta`)
+  )
+
+CREATE TABLE `TarjetaDeCredito` (
+  `idTarjetaDeCredito` INT NOT NULL AUTO_INCREMENT,
+  `idUsuario` INT NOT NULL,
+  `idFranquicia` INT NOT NULL,
+  `idEntidadBancaria` INT NOT NULL,
+  `nombre` VARCHAR(50) NOT NULL,
+  `descripcion` VARCHAR(50) NULL,
+  `fechaCorte` INT NOT NULL,
+  `fechaLimitePago` INT NOT NULL,
+  `limiteMaximoCredito` INT NOT NULL,
+  `fechaRegistro` DATETIME NOT NULL,
+  PRIMARY KEY (`idTarjetaDeCredito`)
+  )
+
+CREATE TABLE `EntidadBancaria` (
+  `idEntidadBancaria` INT NOT NULL AUTO_INCREMENT,
+  `nombre` VARCHAR(50) NOT NULL,
+  PRIMARY KEY (`idEntidadBancaria`)
+)
+
+CREATE TABLE `Franquicia` (
+  `idFranquicia` INT NOT NULL AUTO_INCREMENT,
+  `franquicia` VARCHAR(50) NOT NULL,
+  PRIMARY KEY (`idFranquicia`)
+ )
+
+CREATE TABLE `TipoTransaccion` (
+  `idTipoTransaccion` INT NOT NULL AUTO_INCREMENT,
+  `idCategoriaTransaccion` INT NOT NULL,
+  `nombre` VARCHAR(50) NOT NULL,
+  `descripcion` VARCHAR(50) NOT NULL,
+  PRIMARY KEY (`idTipoTransaccion`)
+)
+
+CREATE TABLE `Cuenta` (
+  `idCuenta` INT NOT NULL AUTO_INCREMENT,
+  `idTipoCuenta` INT NOT NULL,
+  `idEntidadBancaria` INT NOT NULL,
+  `idUsuario` INT NOT NULL,
+  `descripcion` VARCHAR(50) NOT NULL,
+  `saldoDisponible` INT NOT NULL,
+  `fechaRegistro` DATETIME NOT NULL,
+  PRIMARY KEY (`idCuenta`)
+)
+
+CREATE TABLE `Transaccion` (
+  `idTransaccion` INT NOT NULL AUTO_INCREMENT,
+  `idUsuario` INT NOT NULL,
+  `idCuenta` INT NOT NULL,
+  `idCategoriaTransaccion` INT NOT NULL,
+  `idTipoTransaccion` INT NOT NULL,
+  `Valor` INT NOT NULL,
+  `fechaTransaccion` DATETIME NOT NULL,
+  PRIMARY KEY (`idTransaccion`)
+)
+
+CREATE TABLE `CategoriaTransaccion` (
+  `idCategoriaTransaccion` INT NOT NULL AUTO_INCREMENT,
+  `nombre` VARCHAR(50) NOT NULL,
+  `descripcion` VARCHAR(50) NULL,
+  PRIMARY KEY (`idCategoriaTransaccion`)
+)
+
+CREATE TABLE `TipoCuenta` (
+  `idTipoCuenta` INT NOT NULL AUTO_INCREMENT,
+  `nombre` VARCHAR(50) NOT NULL,
+  `descripcion` VARCHAR(50) NOT NULL,
+  `fechaRegistro` DATETIME NOT NULL,
+  PRIMARY KEY (`idTipoCuenta`)
+  )
+
