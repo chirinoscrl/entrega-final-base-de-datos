@@ -44,7 +44,7 @@ CREATE TABLE `tipo_cuenta`
   PRIMARY KEY (`id`)
 );
 
-CREATE TABLE `categoria_transaccion`
+CREATE TABLE `tipo_transaccion`
 (
   `id`          INT          NOT NULL AUTO_INCREMENT,
   `nombre`      VARCHAR(50)  NOT NULL,
@@ -103,7 +103,7 @@ CREATE TABLE `prestamo`
   `monto`               DECIMAL(11, 2) NOT NULL,
   `plazo`               INT            NOT NULL CHECK (`plazo` >= 1 AND `plazo` <= 36),
   `tasa_interes`        FLOAT          NOT NULL CHECK (`tasa_interes` >= 0 AND `tasa_interes` <= 40),
-  `fecha_pago`          DATETIME       NOT NULL,
+  `fecha_pago`          INT            NOT NULL CHECK (`fecha_pago` >= 1 AND `fecha_pago` <= 31),
   `fecha_inicio`        DATETIME       NOT NULL,
   `fecha_registro`      DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `id_usuario`          INT            NOT NULL,
@@ -158,14 +158,14 @@ CREATE TABLE `cuenta`
   FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id`)
 );
 
-CREATE TABLE `tipo_transaccion`
+CREATE TABLE `categoria_transaccion`
 (
   `id`                       INT         NOT NULL AUTO_INCREMENT,
   `nombre`                   VARCHAR(50) NOT NULL,
   `descripcion`              VARCHAR(50) NULL,
-  `id_categoria_transaccion` INT         NOT NULL,
+  `id_tipo_transaccion` INT         NOT NULL,
   PRIMARY KEY (`id`),
-  FOREIGN KEY (`id_categoria_transaccion`) REFERENCES `categoria_transaccion` (`id`)
+  FOREIGN KEY (`id_tipo_transaccion`) REFERENCES `tipo_transaccion` (`id`)
 );
 
 CREATE TABLE `transaccion`
@@ -176,11 +176,9 @@ CREATE TABLE `transaccion`
   `id_usuario`               INT            NOT NULL,
   `id_cuenta`                INT            NOT NULL,
   `id_categoria_transaccion` INT            NOT NULL,
-  `id_tipo_transaccion`      INT            NOT NULL,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`id_cuenta`) REFERENCES `cuenta` (`id`),
-  FOREIGN KEY (`id_categoria_transaccion`) REFERENCES `categoria_transaccion` (`id`),
-  FOREIGN KEY (`id_tipo_transaccion`) REFERENCES `tipo_transaccion` (`id`)
+  FOREIGN KEY (`id_categoria_transaccion`) REFERENCES `categoria_transaccion` (`id`)
 );
 
 
@@ -269,41 +267,36 @@ VALUES ('Efectivo Anual'),
        ('Nominal Anual'),
        ('Nominal Mensual');
 
-INSERT INTO prestamo(monto, plazo, tasa_interes, fecha_pago, fecha_inicio, id_usuario, id_entidad_bancaria, id_tipo_interes)
-VALUES (50000, 36, 6.5, 10, '2023-09-10', 1, 1, 1),
-       (20000, 12, 5.0, 10, '2023-09-10', 2, 2, 1),
-       (30000, 24, 3.5, 10, '2023-09-10', 3, 1, 2),
-       (60000, 60, 4.0, 10, '2023-09-10', 4, 2, 1),
-       (70000, 48, 6.0, 10, '2023-09-10', 5, 1, 1),
-       (40000, 30, 7.0, 10, '2023-09-10', 6, 2, 2),
-       (90000, 72, 5.5, 10, '2023-09-10', 7, 1, 1),
-       (100000, 84, 8.0, 10, '2023-09-10', 8, 2, 3),
-       (25000, 18, 4.5, 10, '2023-09-10', 9, 1, 3),
-       (35000, 24, 6.5, 10, '2023-09-10', 10, 2, 1);
+INSERT INTO prestamo(id, monto, plazo, tasa_interes, fecha_pago, fecha_inicio, id_usuario, id_entidad_bancaria, id_tipo_interes)
+VALUES (1, 50000, 36, 6.5, 10, '2023-09-10', 1, 1, 1),
+       (2, 20000, 12, 5.0, 10, '2023-09-10', 2, 2, 1),
+       (3, 30000, 24, 3.5, 10, '2023-09-10', 3, 1, 2),
+       (4, 60000, 06, 4.0, 10, '2023-09-10', 4, 2, 1),
+       (5, 70000, 04, 6.0, 10, '2023-09-10', 5, 1, 1),
+       (6, 40000, 30, 7.0, 10, '2023-09-10', 6, 2, 2),
+       (7, 90000, 36, 5.5, 10, '2023-09-10', 7, 1, 1),
+       (8, 100000, 08, 8.0, 10, '2023-09-10', 8, 2, 3),
+       (9, 25000, 18, 4.5, 10, '2023-09-10', 9, 1, 3),
+       (10, 35000, 24, 6.5, 10, '2023-09-10', 10, 2, 1);
 
 INSERT INTO abono_prestamo(valor, id_prestamo, fecha_registro)
-VALUES (1389, 1, '2023-10-10'),
-       (1389, 1, '2023-11-10'),
-       (1389, 1, '2023-12-10'),
-       (1389, 1, '2024-01-10'),
-       (1389, 1, '2026-09-10'),
-       (1667, 2, '2023-10-10'),
-       (1667, 2, '2023-11-10'),
-       (1667, 2, '2023-12-10'),
-       (1667, 2, '2024-01-10'),
-       (1667, 2, '2024-09-10'),
-       (1250, 3, '2023-10-10'),
-       (1250, 3, '2023-11-10'),
-       (1250, 3, '2023-12-10'),
-       (1250, 3, '2024-01-10');
+VALUES (5000, 1, '2023-10-10'),
+       (5000, 1, '2023-11-10'),
+       (5000, 1, '2023-12-10'),
+       (5000, 1, '2024-01-10'),
+       (4000, 2, '2023-10-10'),
+       (4000, 2, '2023-11-10'),
+       (3000, 3, '2023-10-10'),
+       (3000, 3, '2023-11-10'),
+       (20000, 3, '2023-12-10');
 
 
-INSERT INTO categoria_transaccion(id, nombre, descripcion)
+INSERT INTO tipo_transaccion (id, nombre, descripcion)
 VALUES (1, 'Ingresos', 'Ingresos de dinero'),
        (2, 'Gastos fijos', 'Gastos fijos mensuales'),
        (3, 'Gastos variables', 'Otros gastos mensuales variables');
 
-INSERT INTO tipo_transaccion(id, nombre, descripcion, id_categoria_transaccion)
+INSERT INTO categoria_transaccion(id, nombre, descripcion, id_tipo_transaccion)
 VALUES (1, 'Comida y restaurantes', 'Gastos en comer afuera', 3),
        (2, 'Supermercado', 'Gastos en supermercado', 2),
        (3, 'Sueldo', 'Depositos de sueldo', 1),
@@ -311,10 +304,17 @@ VALUES (1, 'Comida y restaurantes', 'Gastos en comer afuera', 3),
        (5, 'Alquiler', 'Pago de alquiler', 2),
        (6, 'Impuestos', 'Pago de impuestos', 2);
 
-INSERT INTO transaccion(valor, fecha_transaccion, id_usuario, id_cuenta, id_categoria_transaccion, id_tipo_transaccion)
-VALUES (2000, '2023-09-10', 1, 1, 1, 1),
-       (500, '2023-09-12', 1, 1, 1, 2),
-       (800, '2023-09-15', 1, 2, 2, 3),
-       (200, '2023-09-17', 1, 2, 2, 4),
-       (150, '2023-09-18', 2, 1, 3, 4),
-       (300, '2023-09-20', 2, 1, 3, 6);
+INSERT INTO transaccion(valor, fecha_transaccion, id_usuario, id_cuenta, id_categoria_transaccion)
+VALUES (2000, '2023-11-10', 1, 1, 1),
+       (500, '2023-11-12', 1, 1, 1),
+       (800, '2023-11-15', 1, 2, 2),
+       (200, '2023-11-17', 1, 2, 2),
+       (150, '2023-11-18', 2, 1, 3),
+       (300, '2023-11-20', 2, 1, 3),
+       (2000, DATE_SUB(NOW(), INTERVAL 5 MONTH), 1, 1, 1), -- Ingreso de hace 5 meses
+       (1000, DATE_SUB(NOW(), INTERVAL 4 MONTH), 1, 1, 2), -- Gasto de hace 4 meses
+       (3000, DATE_SUB(NOW(), INTERVAL 3 MONTH), 1, 1, 1), -- Ingreso de hace 3 meses
+       (500, DATE_SUB(NOW(), INTERVAL 2 MONTH), 1, 1, 3), -- Gasto de hace 2 meses
+       (2500, DATE_SUB(NOW(), INTERVAL 1 MONTH), 1, 1, 3), -- Ingreso del mes pasado
+       (2000, NOW(), 1, 1, 2), -- Gasto de este mes
+       (2000, NOW(), 1, 1, 3); -- Gasto de este mes
