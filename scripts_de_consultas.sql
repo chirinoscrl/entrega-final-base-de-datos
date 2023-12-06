@@ -53,19 +53,26 @@ WHERE t.id_usuario = 1
 
 
 -- ¿Cuánto dinero he transferido a mi cuenta de ahorro en el último trimestre?
-SELECT c.id AS id_cuenta,
-    c.descripcion AS descripcion_cuenta,
-    SUM(t.valor) AS transferencias_ultimo_trimestre
-FROM transaccion t
-    JOIN cuenta c ON t.id_cuenta = c.id
-    JOIN tipo_cuenta tc ON c.id_tipo_cuenta = tc.id
-    JOIN tipo_transaccion tt ON t.id_tipo_transaccion = tt.id
-WHERE t.id_usuario = 1
-    AND c.id_tipo_cuenta = 1
-    AND tt.nombre = 'Transferencia'
-    AND t.fecha_transaccion >= DATE_SUB(NOW(), INTERVAL 3 MONTH)
-GROUP BY c.id, c.descripcion;
-
+SELECT
+    usuario.nombre AS nombre_usuario,
+    tipo_cuenta.nombre AS tipo_cuenta,
+    cuenta.descripcion AS nombre_cuenta,
+    SUM(transaccion.valor) AS total_transferido
+FROM
+    transaccion
+INNER JOIN
+    usuario ON usuario.id = transaccion.id_usuario
+INNER JOIN
+    cuenta ON cuenta.id = transaccion.id_cuenta
+INNER JOIN
+    tipo_cuenta ON tipo_cuenta.id = cuenta.id_tipo_cuenta
+WHERE
+    usuario.id = 1
+    AND transaccion.id_categoria_transaccion = 1
+    AND cuenta.id_tipo_cuenta = 1
+    AND transaccion.fecha_transaccion BETWEEN DATE_SUB(NOW(), INTERVAL 3 MONTH) AND NOW()
+GROUP BY
+    usuario.nombre, cuenta.descripcion, tipo_cuenta.nombre;
 
 -- ¿Cuánto he abonado a la meta Vacaciones hasta el momento?
 SELECT m.nombre AS nombre_meta,
@@ -89,14 +96,12 @@ ORDER BY año, mes;
 
 
 -- ¿Cuál es el saldo total de mis cuentas corrientes en este momento?
-SELECT c.id AS id_cuenta,
-    c.descripcion AS descripcion_cuenta,
-    SUM(c.saldo_disponible) AS saldo_total_cuentas_corrientes
-FROM cuenta c
-    JOIN tipo_cuenta tc ON c.id_tipo_cuenta = tc.id
-WHERE t.id_usuario = 1
-    AND tc.nombre = 'Cuenta Corriente'
-GROUP BY c.id, c.descripcion;
+SELECT u.nombre, SUM(c.saldo_disponible) as Saldo_Total
+FROM usuario AS u
+         JOIN cuenta AS c ON u.id = c.id_usuario
+         JOIN tipo_cuenta AS tc ON c.id_tipo_cuenta = tc.id
+WHERE tc.nombre = 'Cuenta Corriente'
+GROUP BY u.nombre;
 
 
 -- ¿Cuál es el gasto acumulado en la categoría "Transporte" en el último semestre?
@@ -111,14 +116,13 @@ GROUP BY ct.nombre;
 
 
 -- ¿Cuál es el valor promedio de los ingresos mensuales en el último año?
-SELECT YEAR(t.fecha_transaccion) AS año,
-    MONTH(t.fecha_transaccion) AS mes,
-    AVG(t.valor) AS promedio_ingresos_mensuales
-FROM transaccion t
-    JOIN tipo_transaccion tt ON t.id_tipo_transaccion = tt.id
-WHERE t.id_usuario = 1
-    AND tt.nombre = 'Ingresos'
-    AND t.fecha_transaccion >= DATE_SUB(NOW(), INTERVAL 1 YEAR)
-GROUP BY año, mes
-ORDER BY año, mes;
+SELECT usuario.id, usuario.nombre, usuario.correo_electronico, AVG(MENSUAL) as 'INGRESO_MENSUAL_PROMEDIO'
+FROM usuario
+JOIN (
+    SELECT id_usuario, YEAR(fecha_transaccion) AS 'YEAR', MONTH(fecha_transaccion) AS 'MONTH', SUM(valor) as 'MENSUAL'
+    FROM transaccion
+    WHERE id_categoria_transaccion = 1 AND fecha_transaccion > DATE_SUB(CURDATE(), INTERVAL 1 YEAR)
+    GROUP BY id_usuario, YEAR(fecha_transaccion), MONTH(fecha_transaccion)
+) AS income ON usuario.id = income.id_usuario
+WHERE usuario.id = 1;
 

@@ -9,7 +9,8 @@ CREATE TABLE `divisa`
   `id`             INT         NOT NULL AUTO_INCREMENT,
   `nombre`         VARCHAR(50) NOT NULL,
   `fecha_registro` DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE (`nombre`)
 );
 
 CREATE TABLE `categoria_meta`
@@ -18,21 +19,24 @@ CREATE TABLE `categoria_meta`
   `nombre`         VARCHAR(50)  NOT NULL,
   `descripcion`    VARCHAR(100) NULL,
   `fecha_registro` DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE (`nombre`)
 );
 
 CREATE TABLE `entidad_bancaria`
 (
   `id`     INT          NOT NULL AUTO_INCREMENT,
   `nombre` VARCHAR(150) NOT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE (`nombre`)
 );
 
 CREATE TABLE `franquicia`
 (
   `id`     INT         NOT NULL AUTO_INCREMENT,
   `nombre` VARCHAR(80) NOT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE (`nombre`)
 );
 
 CREATE TABLE `tipo_cuenta`
@@ -41,7 +45,8 @@ CREATE TABLE `tipo_cuenta`
   `nombre`         VARCHAR(50)  NOT NULL,
   `descripcion`    VARCHAR(100) NULL,
   `fecha_registro` DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE (`nombre`)
 );
 
 CREATE TABLE `tipo_transaccion`
@@ -49,20 +54,22 @@ CREATE TABLE `tipo_transaccion`
   `id`          INT          NOT NULL AUTO_INCREMENT,
   `nombre`      VARCHAR(50)  NOT NULL,
   `descripcion` VARCHAR(100) NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE (`nombre`)
 );
 
 CREATE TABLE `usuario`
 (
   `id`                 INT          NOT NULL AUTO_INCREMENT,
   `nombre`             VARCHAR(100) NOT NULL,
-  `correo_electronico` VARCHAR(50)  NOT NULL,
+  `correo_electronico` VARCHAR(100)  NOT NULL,
   `contrasena`         VARCHAR(255)  NOT NULL,
   `estado`             BOOLEAN      NOT NULL DEFAULT 0,
   `fecha_registro`     DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `id_divisa`          INT          NOT NULL,
   PRIMARY KEY (`id`),
-  FOREIGN KEY (`id_divisa`) REFERENCES `divisa` (`id`)
+  FOREIGN KEY (`id_divisa`) REFERENCES `divisa` (`id`),
+  UNIQUE (`correo_electronico`)
 );
 
 CREATE TABLE `meta`
@@ -94,7 +101,8 @@ CREATE TABLE `tipo_interes`
 (
   `id`     INT         NOT NULL AUTO_INCREMENT,
   `nombre` VARCHAR(50) NOT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE (`nombre`)
 );
 
 CREATE TABLE `prestamo`
@@ -140,7 +148,8 @@ CREATE TABLE `tarjeta_credito`
   PRIMARY KEY (`id`),
   FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id`),
   FOREIGN KEY (`id_franquicia`) REFERENCES `franquicia` (`id`),
-  FOREIGN KEY (`id_entidad_bancaria`) REFERENCES `entidad_bancaria` (`id`)
+  FOREIGN KEY (`id_entidad_bancaria`) REFERENCES `entidad_bancaria` (`id`),
+  UNIQUE (`nombre`)
 );
 
 CREATE TABLE `cuenta`
@@ -165,7 +174,8 @@ CREATE TABLE `categoria_transaccion`
   `descripcion`              VARCHAR(50) NULL,
   `id_tipo_transaccion` INT         NOT NULL,
   PRIMARY KEY (`id`),
-  FOREIGN KEY (`id_tipo_transaccion`) REFERENCES `tipo_transaccion` (`id`)
+  FOREIGN KEY (`id_tipo_transaccion`) REFERENCES `tipo_transaccion` (`id`),
+  UNIQUE (`nombre`)
 );
 
 CREATE TABLE `transaccion`
@@ -208,7 +218,7 @@ VALUES (1, 'Viajes y transporte', 'Categoria de metas relacionadas a viajes', '2
        (2, 'Educación', 'Categoria de metas educativas o cursos', '2020-01-01');
 
 INSERT INTO meta (id, nombre, descripcion, valor, fecha_final, id_usuario, id_categoria_meta, fecha_registro)
-VALUES (1, 'Viaje a Brasil', 'Juntar para viaje fin de año', 5000, '2023-11-30', 1, 1, '2023-05-14'),
+VALUES (1, 'Vacaciones', 'Juntar para viaje fin de año', 5000, '2023-11-30', 1, 1, '2023-05-14'),
        (2, 'Comprar auto', 'Ahorrar para compra de auto', 15000, '2023-12-01', 1, 1, '2023-02-09'),
        (3, 'Curso de Inglés', 'Juntar para curso de ingles intenstivo', 1000, '2023-08-15', 2, 2, '2022-10-30'),
        (4, 'Pasaje a España', 'Ahorrar para viaje a España en 2023', 2000, '2023-06-30', 1, 1, '2023-01-04'),
@@ -317,4 +327,5 @@ VALUES (2000, '2023-11-10', 1, 1, 1),
        (500, DATE_SUB(NOW(), INTERVAL 2 MONTH), 1, 1, 3), -- Gasto de hace 2 meses
        (2500, DATE_SUB(NOW(), INTERVAL 1 MONTH), 1, 1, 3), -- Ingreso del mes pasado
        (2000, NOW(), 1, 1, 2), -- Gasto de este mes
+       (1500, NOW(), 1, 1, 6),
        (2000, NOW(), 1, 1, 3); -- Gasto de este mes
